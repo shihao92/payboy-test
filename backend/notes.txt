@@ -1,0 +1,13 @@
+# Movies
+title - string
+tagline - string
+overview - text
+homepage - string
+runtime - integer
+budget - string
+revenue - string
+status - enum("rumored","planned","in production","post production","released","cancelled")
+release_date - timestamp
+score - string
+
+genres - 1 movie could have many genres

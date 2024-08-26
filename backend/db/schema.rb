@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_26_024834) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_26_031355) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,12 +20,34 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_26_024834) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "genres_movies", id: false, force: :cascade do |t|
+    t.bigint "movie_id", null: false
+    t.bigint "genre_id", null: false
+    t.index ["genre_id"], name: "index_genres_movies_on_genre_id"
+    t.index ["movie_id"], name: "index_genres_movies_on_movie_id"
+  end
+
   create_table "jwt_denylists", force: :cascade do |t|
     t.string "jti"
     t.datetime "exp"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
+  end
+
+  create_table "movies", force: :cascade do |t|
+    t.string "title"
+    t.string "tagline"
+    t.text "overview"
+    t.string "homepage"
+    t.integer "runtime"
+    t.string "budget"
+    t.string "revenue"
+    t.integer "status"
+    t.datetime "release_date", precision: nil
+    t.string "score"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
