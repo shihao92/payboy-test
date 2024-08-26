@@ -18,7 +18,11 @@ class MoviesController < ApplicationController
     @movie = Movie.new(movie_params)
 
     if @movie.save
-      render json: @movie, status: :created, location: @movie
+      if params[:genre_ids]
+        @movie.genres << Genre.where(id: params[:genre_ids])
+      end
+
+      render json: @movie.as_json(include: :genres), status: :created, location: @movie
     else
       render json: @movie.errors, status: :unprocessable_entity
     end
@@ -27,7 +31,11 @@ class MoviesController < ApplicationController
   # PATCH/PUT /movies/1
   def update
     if @movie.update(movie_params)
-      render json: @movie
+      if params[:genre_ids]
+        @movie.genres = Genre.where(id: params[:genre_ids])
+      end
+
+      render json: @movie.as_json(include: :genres), status: :created, location: @movie
     else
       render json: @movie.errors, status: :unprocessable_entity
     end
@@ -39,13 +47,11 @@ class MoviesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_movie
       @movie = Movie.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def movie_params
-      params.require(:movie).permit(:title, :tagline, :overview, :homepage, :runtime, :budget, :revenue, :status, :release_date, :score)
+      params.require(:movie).permit(:title, :tagline, :overview, :homepage, :runtime, :budget, :revenue, :status, :release_date, :score, genre_ids: [])
     end
 end
