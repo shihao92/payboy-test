@@ -1,0 +1,26 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 300;
+}
+
+body { 
+  margin: 0;
+}
+
+.content-wrapper {
+  margin-left: 200px; /* Adjust based on the side menu width */
+  padding-top: 0px; /* Adjust based on the header height */
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.btn-add {
+  width: 40px;
+  height: 40px;
+}
