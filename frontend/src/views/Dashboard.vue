@@ -56,6 +56,7 @@ import SideMenu from '../components/SideMenu.vue';
 import Header from '../components/Header.vue';
 import PageTitle from '../components/PageTitle.vue';
 import Toast from '../components/Toast.vue';
+import { api_url } from '../../constants.json';
 
 export default {
   name: 'Dashboard',
@@ -67,7 +68,7 @@ export default {
   },
   async mounted() {
     try {
-      const response = await axios.get(`http://localhost:3002/movies?page=${this.data.meta.current_page}&per_page=10`, {
+      const response = await axios.get(`${api_url}/movies?page=${this.data.meta.current_page}&per_page=10`, {
         headers: {
           Authorization: localStorage.getItem('authToken')
         }

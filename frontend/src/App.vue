@@ -1,4 +1,5 @@
 <script setup>
+import AxiosInterceptors from './utils/AxiosInterceptors';
 </script>
 
 <template>

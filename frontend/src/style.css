@@ -14,6 +14,11 @@ body {
 .content-wrapper {
   margin-left: 200px; /* Adjust based on the side menu width */
   padding-top: 0px; /* Adjust based on the header height */
+  background: #f0f0f0;
+}
+
+.content {
+  height: 100vh;
 }
 
 .ml-auto {

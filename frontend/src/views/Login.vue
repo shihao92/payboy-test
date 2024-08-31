@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #a52828;">
+  <div class="d-flex justify-content-center align-items-center" style="background-color:#a52828;height:100vh;">
     <div class="card p-4" style="width: 320px; background-color: rgba(255, 255, 255, 0.2);">
       <div class="card-body text-center">
         <h2 class="text-white mb-4">Rails Flix</h2>
@@ -37,6 +37,8 @@
 <script>
 import axios from 'axios';
 import Toast from '../components/Toast.vue';
+import { api_url } from '../../constants.json';
+
 export default {
   name: 'Login',
   data() {
@@ -58,14 +60,14 @@ export default {
         password: this.password,
       };
       try {
-        const response = await axios.post('http://localhost:3002/login', {
+        const response = await axios.post(`${api_url}/login`, {
           "user": userData
         });
         console.log('response.data:', response.data);
-        await localStorage.setItem('authToken', response.headers.authorization);
+        localStorage.setItem('authToken', response.headers.authorization);
         if(this.rememberMe) {
-          await localStorage.setItem('payboy-email', this.email);
-          await localStorage.setItem('payboy-password', this.password);
+          localStorage.setItem('payboy-email', this.email);
+          localStorage.setItem('payboy-password', this.password);
         }
         this.$router.push('/dashboard');
       } catch (error) {
