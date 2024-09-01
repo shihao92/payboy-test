@@ -38,7 +38,13 @@
                 </td>
                 <td>{{ formatDate(movie.release_date) }}</td>
                 <td>{{ movie.score }}</td>
-                <td><button class="btn btn-danger btn-sm">Delete</button></td>
+                <td>
+                  <button 
+                    class="btn btn-danger btn-sm" 
+                    @click="onClickShowConfirmDelete(movie.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -48,10 +54,16 @@
     </div>
   </div>
   <Toast ref="toast" />
+  <LoadingOverlay :isLoading="isLoading" />
+  <ConfirmDeleteModal 
+    :show="showConfirmDelete"
+    :title="titleConfirmDelete"
+    :message="messageConfirmDelete"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete" />
 </template>
 
 <script>
-import axios from 'axios';
 import _ from 'lodash'
 import { format } from 'date-fns';
 import SideMenu from '../components/SideMenu.vue';
@@ -59,21 +71,9 @@ import Header from '../components/Header.vue';
 import PageTitle from '../components/PageTitle.vue';
 import Toast from '../components/Toast.vue';
 import Pagination from '../components/Pagination.vue';
-import { api_url } from '../../constants.json';
-
-const loadMovies = async(data, toast) => {
-  try {
-    const response = await axios.get(`${api_url}/movies?page=${data.meta.current_page}&per_page=10`, {
-      headers: {
-        Authorization: localStorage.getItem('authToken')
-      }
-    })
-    return response.data
-  } catch (error) {
-    toast.showToast('Error!', `Failed to load movies, error: ${error}`);
-  }
-}
-
+import LoadingOverlay from '../components/LoadingOverlay.vue';
+import ConfirmDeleteModal from '../components/ConfirmDelete.vue'; 
+import { loadMovies, deleteMovie } from '../services'
 export default {
   name: 'Dashboard',
   components: {
@@ -81,26 +81,19 @@ export default {
     Header,
     PageTitle,
     Toast,
-    Pagination
+    Pagination,
+    LoadingOverlay,
+    ConfirmDeleteModal
   },
   async mounted() {
+    this.isLoading = true;
     this.data = await loadMovies(this.data, this.$refs.toast);
+    this.isLoading = false;
   },
   data() {
     return {
       data: {
-        movies: [
-          // Populate this with movie data
-          // {
-          //   id: 1,
-          //   title: 'Deadpool & Wolverine',
-          //   directors: 'Shawn Levy',
-          //   genres: ['Action', 'Comedy', 'Science Fiction'],
-          //   status: 'Released',
-          //   releaseDate: '07/24/2024',
-          //   score: '77%',
-          // },
-        ],
+        movies: [],
         meta: {
           current_page: 1,
           next_page: null,
@@ -115,7 +108,12 @@ export default {
           name: 'Movies',
           currentPage: true
         }
-      ]
+      ],
+      isLoading: false,
+      showConfirmDelete: false,
+      titleConfirmDelete: 'Notification',
+      messageConfirmDelete: 'Are you sure to remove selected movie?',
+      selectedMovieId: 0
     };
   },
   methods: {
@@ -127,7 +125,22 @@ export default {
     },
     async onChangePage(page) {
       this.data.meta.current_page = page;
+      this.isLoading = true;
       this.data = await loadMovies(this.data, this.$refs.toast);
+      this.isLoading = false;
+    },
+    onClickShowConfirmDelete(movieId) {
+      this.showConfirmDelete = true;
+      this.selectedMovieId = movieId;
+    },
+    async confirmDelete() {
+      this.showConfirmDelete = false;
+      this.isLoading = true;
+      this.data.movies = await deleteMovie(this.data.movies, this.selectedMovieId, this.$refs.toast);
+      this.isLoading = false;
+    },
+    cancelDelete() {
+      this.showConfirmDelete = false;
     }
   }
 };

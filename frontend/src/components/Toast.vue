@@ -65,6 +65,8 @@ export default {
   z-index: 1055;
   top: 1rem;
   right: 1rem;
+  transform: none !important;
+  margin: 15px !important;
 }
 .toast {
   opacity: 0;

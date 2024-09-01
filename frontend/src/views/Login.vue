@@ -3,7 +3,7 @@
     <div class="card p-4" style="width: 320px; background-color: rgba(255, 255, 255, 0.2);">
       <div class="card-body text-center">
         <h2 class="text-white mb-4">Rails Flix</h2>
-        <form @submit.prevent="handleSubmit">
+        <div>
           <div class="mb-3">
             <div class="input-group">
               <span class="input-group-text bg-transparent text-white">
@@ -26,16 +26,18 @@
               Remember me
             </label>
           </div>
-          <button type="submit" class="btn btn-danger btn-block">Login</button>
-        </form>
-        <Toast ref="toast" />
+          <button class="btn btn-danger btn-block" @click="handleSubmit">Login</button>
+        </div>
       </div>
     </div>
   </div>
+  <Toast ref="toast" />
 </template>
 
 <script>
 import axios from 'axios';
+import useVuelidate from '@vuelidate/core';
+import { required, minLength, email } from '@vuelidate/validators';
 import Toast from '../components/Toast.vue';
 import { api_url } from '../../constants.json';
 
@@ -54,8 +56,12 @@ export default {
     this.rememberMe = (this.email && this.password) ? 'true' : 'false';
   },
   methods: {
-    async handleSubmit(e) {
-      e.preventDefault();
+    async handleSubmit() {
+      const result = await this.v$.$validate();
+      if (!result) {
+        this.$refs.toast.showToast('Error!', 'Please fill in the login form correctly.');
+        return;
+      }
       const userData = {
         email: this.email,
         password: this.password,
@@ -64,23 +70,35 @@ export default {
         const response = await axios.post(`${api_url}/login`, {
           "user": userData
         });
-        console.log('response.data:', response.data);
+        if(response?.response?.data) {
+          this.$refs.toast.showToast('Error!', `Failed to login into the system, error: ${response.response.data}`);
+          return;
+        }
         localStorage.setItem('authToken', response.headers.authorization);
         if(this.rememberMe) {
           localStorage.setItem('payboy-email', this.email);
           localStorage.setItem('payboy-password', this.password);
+        } else {
+          localStorage.removeItem('payboy-email');
+          localStorage.removeItem('payboy-password');
         }
         this.$router.push('/dashboard');
       } catch (error) {
         this.$refs.toast.showToast('Error!', `Failed to login into the system, error: ${error}`);
       }
     },
-    triggerToast() {
-      this.$refs.toast.showToast('Success!', 'Your action was successful.');
-    },
   },
   components: {
     Toast,
   },
+  setup() {
+    return { v$: useVuelidate() }
+  },
+  validations () {
+    return {
+      email: { required, minLength: minLength(1), email },
+      password: { required, minLength: minLength(1) }
+    }
+  }
 };
 </script>

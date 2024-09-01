@@ -5,9 +5,9 @@ export default Axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(error)
-    if (error.response.status === 401) {
+    if (error.response.status === 401 && error.request.responseURL.indexOf('login') === -1) {
       window.location.href = '/';
     }
+    return error;
   }
 )

@@ -44,12 +44,12 @@ export default {
   }, methods: {
     async handleLogout() {
       try {
-        const response = await axios.delete('http://localhost:3002/logout', {
+        await axios.delete('http://localhost:3002/logout', {
           headers: {
             Authorization: localStorage.getItem('authToken')
           }
         });
-        await localStorage.removeItem('authToken');
+        localStorage.removeItem('authToken');
         this.$router.push('/');
       } catch (error) {
         console.error('Error logging in:', error);

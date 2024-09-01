@@ -17,6 +17,7 @@
     </div>
   </div>
   <Toast ref="toast" />
+  <LoadingOverlay :isLoading="isLoading" />
 </template>
 
 <script>
@@ -28,6 +29,9 @@ import Header from '../components/Header.vue';
 import PageTitle from '../components/PageTitle.vue';
 import Toast from '../components/Toast.vue';
 import MovieForm from '../components/MovieForm.vue';
+import LoadingOverlay from '../components/LoadingOverlay.vue';
+import { addMovie } from '../services';
+
 export default {
   name: 'AddMovie',
   components: {
@@ -36,7 +40,8 @@ export default {
     PageTitle,
     Toast,
     MovieForm,
-    Toast
+    Toast,
+    LoadingOverlay
   },
   data() {
     return {
@@ -66,6 +71,7 @@ export default {
           currentPage: true
         }
       ],
+      isLoading: false
     };
   },
   methods: {
@@ -80,20 +86,9 @@ export default {
       this.newMovie.genre_ids.map(item => {
         tmpNewMovie.genre_ids.push(item.id);
       })
-      // show loading overlay
-      try {
-        await axios.post(`${api_url}/movies`, {
-          "movie": tmpNewMovie
-        }, {
-          headers: {
-            Authorization: localStorage.getItem('authToken')
-          }
-        })
-        this.$refs.toast.showToast('Success!', 'Movie added successfully.');
-        // redirect back to dashboard
-      } catch (error) {
-        this.$refs.toast.showToast('Error!', `Failed to add movie, error: ${error}`);
-      }
+      this.isLoading = true;
+      await addMovie(this.$refs.toast, this.$router, tmpNewMovie);
+      this.isLoading = false;
     }
   },
   setup() {
