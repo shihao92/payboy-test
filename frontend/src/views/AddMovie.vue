@@ -64,7 +64,7 @@ export default {
       breadcrumbs: [
         {
           route: '/dashboard',
-          name: 'Home',
+          name: 'Movies',
           currentPage: false
         },
         {

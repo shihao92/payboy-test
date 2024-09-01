@@ -5,7 +5,16 @@
     </div>
     <ul class="nav flex-column">
       <li class="nav-item">
-        <router-link class="nav-link text-white" to="/dashboard">Movies</router-link>
+        <router-link 
+          class="nav-link text-white" 
+          :class="{ 'active-menu': currentActiveURL === '/dashboard' }"
+          to="/dashboard">Movies</router-link>
+      </li>
+      <li class="nav-item">
+        <router-link 
+          class="nav-link text-white" 
+          :class="{ 'active-menu': currentActiveURL === '/my-account' }"
+          to="/my-account">My Account</router-link>
       </li>
     </ul>
   </div>
@@ -14,6 +23,21 @@
 <script>
 export default {
   name: 'SideMenu',
+  data() {
+    return {
+      currentActiveURL: this.$route.path
+    }
+  },
+  computed: {
+    currentRouteName() {
+      return this.$route.path;
+    },
+  },
+  watch: {
+    $route(to, from) {
+      this.currentActiveURL = to.path;
+    },
+  },
 };
 </script>
 
@@ -32,6 +56,10 @@ export default {
 }
 
 .nav-link:hover {
+  background-color: #495057;
+}
+
+.active-menu {
   background-color: #495057;
 }
 </style>

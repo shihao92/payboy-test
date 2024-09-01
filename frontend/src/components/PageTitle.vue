@@ -16,6 +16,10 @@
       class="btn btn-success ml-auto btn-save-movie" 
       v-if="showNewMovieButton" 
       @click="onClickSaveNewMovie">Save Movie</button>
+    <button 
+      class="btn btn-success ml-auto btn-save-movie" 
+      v-if="showSaveProfileButton" 
+      @click="onClickSaveProfile">Save Profile</button>
   </div>
 </template>
 
@@ -35,6 +39,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    showSaveProfileButton: {
+      type: Boolean,
+      default: false,
+    },
     paths: {
       type: Array,
       default: [],
@@ -44,6 +52,10 @@ export default {
       default: () => {},
     },
     onClickSaveNewMovie: {
+      type: Function,
+      default: () => {},
+    },
+    onClickSaveProfile: {
       type: Function,
       default: () => {},
     },

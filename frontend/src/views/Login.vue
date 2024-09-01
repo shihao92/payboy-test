@@ -74,7 +74,9 @@ export default {
           this.$refs.toast.showToast('Error!', `Failed to login into the system, error: ${response.response.data}`);
           return;
         }
+        let currentLoginUser = JSON.stringify(response.data.status.data.user);
         localStorage.setItem('authToken', response.headers.authorization);
+        localStorage.setItem('currentLoginUser', currentLoginUser);
         if(this.rememberMe) {
           localStorage.setItem('payboy-email', this.email);
           localStorage.setItem('payboy-password', this.password);

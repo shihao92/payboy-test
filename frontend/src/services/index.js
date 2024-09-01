@@ -13,7 +13,6 @@ export const loadMovies = async(data, toast) => {
         item.photo_url = `${api_url}${item.photo_url}`;
       }
     })
-    console.log(response.data)
     return response.data
   } catch (error) {
     toast.showToast('Error!', `Failed to load movies, error: ${error}`);

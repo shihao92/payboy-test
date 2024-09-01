@@ -11,12 +11,12 @@
         aria-expanded="false"
         @click="showDropDown = !showDropDown"
       >
-        <span class="username">Demo <strong>User</strong></span>
+        <span class="username"><strong>{{ currentLoginUser.name }}</strong></span>
         <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
       </a>
       <ul class="dropdown-menu dropdown-menu-end" :style="dynamicStyles">
         <li>
-          <a class="dropdown-item" href="#">My Account</a>
+          <router-link class="dropdown-item" to="/my-account">My Account</router-link>
         </li>
         <li>
           <a class="dropdown-item" href="#" @click="handleLogout">Logout</a>
@@ -32,8 +32,15 @@ export default {
   name: 'Header',
   data() {
     return {
-      showDropDown: false
+      showDropDown: false,
+      currentLoginUser: {
+        email: '',
+        name: ''
+      }
     }
+  },
+  mounted() {
+    this.currentLoginUser = JSON.parse(localStorage.getItem('currentLoginUser'));
   },
   computed: {
     dynamicStyles() {
@@ -41,7 +48,8 @@ export default {
         display: this.showDropDown ? 'block' : 'none'
       }
     }
-  }, methods: {
+  }, 
+  methods: {
     async handleLogout() {
       try {
         await axios.delete('http://localhost:3002/logout', {

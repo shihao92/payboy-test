@@ -1,17 +1,19 @@
 class MoviesController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_movie, only: %i[ show update destroy ]
 
   # GET /movies
   def index
-    @movies = Movie.includes(:genres).page(params[:page]).per(params[:per_page] || 10)
+    @movies = filter_movies(Movie.order(created_at: :desc).includes(:genres).page(params[:page]).per(params[:per_page] || 10))
     render json: {
       movies: @movies.as_json(
-        only: [:id, :title, :status, :release_date, :score],
+        only: [:id, :title, :status, :release_date, :score, :director],
         include: {
           genres: {
             only: [:name]
           },
         },
+        methods: :photo_url
       ),
       meta: pagination_meta(@movies)
     }
@@ -70,31 +72,16 @@ class MoviesController < ApplicationController
   end
 
   def movie_params
-    params.require(:movie).permit(:title, :tagline, :overview, :homepage, :runtime, :budget, :revenue, :status, :release_date, :score, genre_ids: [])
+    params.require(:movie).permit(:title, :tagline, :overview, :homepage, :runtime, :budget, :revenue, :status, :release_date, :score, :director, genre_ids: [])
   end
 
-  def format_errors(errors)
-    errors.messages.transform_values { |messages| messages.join(', ') }
-  end
+  def filter_movies(movies)
+    filters = params.slice(:title, :tagline, :overview, :homepage, :director)
 
-  def decode_base64_image(base64_image)
-    content_type = base64_image[%r{data:(.*?);base64}, 1]
-    encoded_image = base64_image.sub(%r{^data:.*;base64,}, '')
-    decoded_image = Base64.decode64(encoded_image)
-    {
-      io: StringIO.new(decoded_image),
-      filename: "upload-#{Time.now.to_i}.#{content_type.split('/').last}",
-      content_type: content_type
-    }
-  end
+    filters.each do |key, value|
+      movies = movies.where("#{key} ILIKE ?", "%#{value}%") if value.present?
+    end
 
-  def pagination_meta(collection)
-    {
-      current_page: collection.current_page,
-      next_page: collection.next_page,
-      prev_page: collection.prev_page,
-      total_pages: collection.total_pages,
-      total_count: collection.total_count
-    }
+    movies
   end
 end
