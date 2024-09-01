@@ -12,3 +12,8 @@ The backend and frontend sits at monorepo but are both different apps.
 - run rails s to start the localhost server which runs on port 3002
 
 ## Frontend
+- obtain the constants.json from me
+- cd into the frontend directory
+- place the constants.json in the frontend directory
+- run yarn install
+- then run yarn dev
