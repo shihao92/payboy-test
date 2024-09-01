@@ -42,6 +42,7 @@
               </tr>
             </tbody>
           </table>
+          <Pagination :meta="data.meta" :onChangePage="onChangePage" />
         </div>
       </div>
     </div>
@@ -51,12 +52,27 @@
 
 <script>
 import axios from 'axios';
+import _ from 'lodash'
 import { format } from 'date-fns';
 import SideMenu from '../components/SideMenu.vue';
 import Header from '../components/Header.vue';
 import PageTitle from '../components/PageTitle.vue';
 import Toast from '../components/Toast.vue';
+import Pagination from '../components/Pagination.vue';
 import { api_url } from '../../constants.json';
+
+const loadMovies = async(data, toast) => {
+  try {
+    const response = await axios.get(`${api_url}/movies?page=${data.meta.current_page}&per_page=10`, {
+      headers: {
+        Authorization: localStorage.getItem('authToken')
+      }
+    })
+    return response.data
+  } catch (error) {
+    toast.showToast('Error!', `Failed to load movies, error: ${error}`);
+  }
+}
 
 export default {
   name: 'Dashboard',
@@ -64,19 +80,11 @@ export default {
     SideMenu,
     Header,
     PageTitle,
-    Toast
+    Toast,
+    Pagination
   },
   async mounted() {
-    try {
-      const response = await axios.get(`${api_url}/movies?page=${this.data.meta.current_page}&per_page=10`, {
-        headers: {
-          Authorization: localStorage.getItem('authToken')
-        }
-      })
-      this.data = response.data;
-    } catch (error) {
-      console.error('Error loading movies:', error);
-    }
+    this.data = await loadMovies(this.data, this.$refs.toast);
   },
   data() {
     return {
@@ -116,6 +124,10 @@ export default {
     },
     onClickAdd() {
       this.$router.push('/add-movie');
+    },
+    async onChangePage(page) {
+      this.data.meta.current_page = page;
+      this.data = await loadMovies(this.data, this.$refs.toast);
     }
   }
 };

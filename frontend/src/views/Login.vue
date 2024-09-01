@@ -54,7 +54,8 @@ export default {
     this.rememberMe = (this.email && this.password) ? 'true' : 'false';
   },
   methods: {
-    async handleSubmit() {
+    async handleSubmit(e) {
+      e.preventDefault();
       const userData = {
         email: this.email,
         password: this.password,

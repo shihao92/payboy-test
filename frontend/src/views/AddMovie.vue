@@ -12,7 +12,6 @@
       <div class="content p-3">
         <MovieForm 
           :newMovie="newMovie"
-          :genres="genres"
           :v$="v$" />
       </div>
     </div>
@@ -21,9 +20,9 @@
 </template>
 
 <script>
-import axios from 'axios';
 import useVuelidate from '@vuelidate/core';
 import { required, minLength } from '@vuelidate/validators';
+import _ from 'lodash';
 import SideMenu from '../components/SideMenu.vue';
 import Header from '../components/Header.vue';
 import PageTitle from '../components/PageTitle.vue';
@@ -36,23 +35,8 @@ export default {
     Header,
     PageTitle,
     Toast,
-    MovieForm
-  },
-  async mounted() {
-    try {
-      let tmpGenres = [];
-      const response = await axios.get(`http://localhost:3002/genres`, {
-        headers: {
-          Authorization: localStorage.getItem('authToken')
-        }
-      })
-      response.data.map(item => {
-        tmpGenres.push(item.name);
-      })
-      this.genres = tmpGenres;
-    } catch (error) {
-      console.error('Error loading genres:', error);
-    }
+    MovieForm,
+    Toast
   },
   data() {
     return {
@@ -82,18 +66,33 @@ export default {
           currentPage: true
         }
       ],
-      genres: []
     };
   },
   methods: {
     async onClickSaveNewMovie() {
-      console.log('newMovie:', this.newMovie);
+      let tmpNewMovie = _.cloneDeep(this.newMovie);
+      tmpNewMovie.genre_ids = [];
       const result = await this.v$.$validate()
       if (!result) {
-        // notify user form is invalid
-        console.log(this.v$.$errors)
-        console.log(this.v$.newMovie.title.$errors)
+        this.$refs.toast.showToast('Error!', `Please fill in all the required fields.`);
         return
+      }
+      this.newMovie.genre_ids.map(item => {
+        tmpNewMovie.genre_ids.push(item.id);
+      })
+      // show loading overlay
+      try {
+        await axios.post(`${api_url}/movies`, {
+          "movie": tmpNewMovie
+        }, {
+          headers: {
+            Authorization: localStorage.getItem('authToken')
+          }
+        })
+        this.$refs.toast.showToast('Success!', 'Movie added successfully.');
+        // redirect back to dashboard
+      } catch (error) {
+        this.$refs.toast.showToast('Error!', `Failed to add movie, error: ${error}`);
       }
     }
   },

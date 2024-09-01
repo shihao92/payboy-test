@@ -1,16 +1,20 @@
 <template>
-  <div class="toast-container position-fixed p-3" ref="toastContainer">
-    <div
-      class="toast"
-      role="alert"
-      aria-live="assertive"
+  <div class="toast-container" ref="toastContainer">
+    <div 
+      class="toast" 
+      role="alert" 
+      aria-live="assertive" 
       aria-atomic="true"
       :class="{'show': visible}"
-      ref="toast"
-    >
+      ref="toast">
       <div class="toast-header">
         <strong class="me-auto">{{ title }}</strong>
-        <button type="button" class="btn-close" @click="hideToast"></button>
+        <button 
+          type="button" 
+          class="btn-close" 
+          data-bs-dismiss="toast" 
+          aria-label="Close"
+          @click="hideToast"></button>
       </div>
       <div class="toast-body">
         {{ message }}
@@ -33,7 +37,7 @@ export default {
   },
   mounted() {
     this.popperInstance = createPopper(this.$refs.toast, this.$refs.toastContainer, {
-      placement: 'top-end',
+      placement: 'bottom-end',
     });
   },
   methods: {
