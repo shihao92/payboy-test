@@ -57,6 +57,8 @@ export default {
         "release_date": "",
         "score": "",
         "genre_ids": [],
+        "photo_data": "",
+        "director": "",
         "photo_data": ""
       },
       breadcrumbs: [

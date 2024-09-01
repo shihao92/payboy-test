@@ -13,6 +13,7 @@
           <table class="table table-striped">
             <thead>
               <tr>
+                <th></th>
                 <th>Title</th>
                 <th>Directors</th>
                 <th>Genres</th>
@@ -24,8 +25,9 @@
             </thead>
             <tbody>
               <tr v-for="movie in data.movies" :key="movie.id">
+                <td><img v-if="movie.photo_url" :src="movie.photo_url" style="width:34px;height:50px;" /></td>
                 <td>{{ movie.title }}</td>
-                <td>{{ movie.directors }}</td>
+                <td>{{ movie.director }}</td>
                 <td>
                   <span v-for="genre in movie.genres" :key="genre" class="badge bg-danger me-1">
                     {{ genre.name }}

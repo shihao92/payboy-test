@@ -46,6 +46,13 @@
             class="form-control"
             v-model="newMovie.homepage" />
         </div>
+        <div class="form-group">
+          <label>Director</label>
+          <input 
+            type="text" 
+            class="form-control"
+            v-model="newMovie.director" />
+        </div>
         <div class="row">
           <div class="col-sm-4">
             <div class="form-group">
@@ -78,6 +85,10 @@
       </div>
       <div class="col-sm-4">
         <div class="form-group">
+          <label>Upload photo</label>
+          <input type="file" @change="onFileChange" accept="image/*" />
+        </div>
+        <div class="form-group">
           <label>Status *</label>
           <select class="form-control" v-model="newMovie.status">
             <option></option>
@@ -96,15 +107,23 @@
             class="form-control"
             v-model="newMovie.release_date" />
         </div>
+        <div class="form-group">
+          <label>Score</label>
+          <input 
+            type="text" 
+            class="form-control"
+            v-model="newMovie.score" />
+        </div>
       </div>
     </div>
   </form>
+  <Toast ref="toast" />
 </template>
 
 <script>
-import axios from 'axios';
 import Multiselect from 'vue-multiselect'
-import { api_url } from '../../constants.json';
+import Toast from '../components/Toast.vue';
+import { loadGenres } from '../services';
 export default {
   name: 'MovieForm',
   props: {
@@ -121,7 +140,8 @@ export default {
     }
   },
   components: {
-    Multiselect
+    Multiselect,
+    Toast,
   },
   data() {
     return {
@@ -137,21 +157,29 @@ export default {
     }
   },
   async mounted() {
-    try {
-      const response = await axios.get(`${api_url}/genres`, {
-        headers: {
-          Authorization: localStorage.getItem('authToken')
-        }
-      })
-      return this.genres = response.data;
-    } catch (error) {
-      this.$refs.toast.showToast('Error!', `Failed to grab genres from the system, error: ${error}`);
-    }
+    this.genres = await loadGenres(this.$refs.toast);
   },
   methods: {
     formatSelectedGenre({name}) {
       return name
-    }
+    },
+    onFileChange(event) {
+      const file = event.target.files[0];
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+
+      if (file && file.size > maxSize) {
+        this.$refs.toast.showToast('Error!', 'File size exceeds 2MB. Please choose a smaller file.');
+        return;
+      } 
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.newMovie.photo_data = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
   }
 };
 </script>

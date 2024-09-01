@@ -8,6 +8,12 @@ export const loadMovies = async(data, toast) => {
         Authorization: localStorage.getItem('authToken')
       }
     })
+    response.data.movies.map(item => {
+      if(item.photo_url) {
+        item.photo_url = `${api_url}${item.photo_url}`;
+      }
+    })
+    console.log(response.data)
     return response.data
   } catch (error) {
     toast.showToast('Error!', `Failed to load movies, error: ${error}`);
@@ -42,5 +48,18 @@ export const deleteMovie = async(movies, selectedMovieId, toast) => {
     return movies;
   } catch (error) {
     toast.showToast('Error!', `Failed to delete movie, error: ${error}`);
+  }
+}
+
+export const loadGenres = async(toast) => {
+  try {
+    const response = await axios.get(`${api_url}/genres`, {
+      headers: {
+        Authorization: localStorage.getItem('authToken')
+      }
+    });
+    return response.data;
+  } catch (error) {
+    toast.showToast('Error!', `Failed to load genres, error: ${error}`);
   }
 }
